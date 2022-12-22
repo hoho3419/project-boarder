@@ -7,10 +7,10 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -24,6 +24,10 @@ import java.util.Set;
    3) 동등성, 동일성 비교할 수 있는 코드 넣어볼거임
 * */
 
+/* JPA란 자바 ORM 기술 표준
+*  Entity를 분석, create나 insert 같은 sql 쿼리를 생성해준다.
+*  JDBC API 사용해서 DB 접근도 해주고 객체와 테이블을 매핑해준다. */
+
 /*
     @Table - 엔티티와 매핑할 정보를 지정하고,
                 사용법) @Index(name="원하는 명칭",columnList = "원하는 테이블명")
@@ -31,6 +35,7 @@ import java.util.Set;
      @Index - 데이터베이스 인덱스는 추가, 쓰기및 저장 공간을 희생해서 테이블에 대한 데어터 검색속도를 향상시키는 데이터 구조
                 @Entity와 세트로 사용
 * */
+@EntityListeners(AuditingEntityListener.class) // 이거 없으면 createAt 에러남
 @Table(indexes = {
         @Index(columnList = "title"),
         @Index(columnList = "hashtag"),
@@ -116,14 +121,15 @@ public class Article {
     protected Article() {}
 
     /* 사용자가 입력하는 값만 받기. 나머지는 시스템이 알아서 하게 해주면 됨 */
-    private Article(Long id, String title, String content) {
-        this.id = id;
+
+    private Article(String title, String content, String hashtag) {
         this.title = title;
         this.content = content;
+        this.hashtag = hashtag;
     }
 
-    public static Article of(Long id, String title, String content){
-        return new Article(id,title,content);
+    public static Article of(String title, String content, String hashtag){
+        return new Article(title,content,hashtag);
     }
     /* 정적 팩토리 메서드 (factory, method, pattern 중에 하나)
     *  정적 팩토리 메서드란 객체 생성 역할을 하는 클래스 메서드 라는 뜻.
