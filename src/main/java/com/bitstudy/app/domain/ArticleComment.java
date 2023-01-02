@@ -58,5 +58,4 @@ public class ArticleComment extends AuditingFields{
 //    @CreatedBy
 //    @Column(nullable=false, length=100)
 //    private String modifiedBy; // 수정자
-
 }
