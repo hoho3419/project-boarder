@@ -9,6 +9,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
  * - TDD 만드는 방법
  * 1) 우클릭  > Go to > Test (ctrl + shift + T)
  * 2) JUint5 버전인지 확인
+ * 테스트 만들기
  * */
 @RepositoryRestResource
 public interface ArticleCommentRepository extends JpaRepository<ArticleComment, Long> {

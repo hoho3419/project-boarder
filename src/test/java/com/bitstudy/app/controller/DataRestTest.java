@@ -30,15 +30,23 @@ package com.bitstudy.app.controller;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
+
+
+@SpringBootTest /* 이것만 있으면 MockMvc 를 알아볼 수가 없어서 @AutoConfigureMockMvc 도 같이 넣기 */
+@AutoConfigureMockMvc
+@DisplayName("Data REST - API 테스트")
+@Transactional /* 테스트 돌리면 Hibernate 부분에 select 쿼리문이 나오면서 실제 DB 를 건드리는데, 테스트 끝난 이후에 DB를 롤백 시키는 용도 */
 public class DataRestTest {
 
     private final MockMvc mvc;
@@ -55,7 +63,7 @@ public class DataRestTest {
 
     @DisplayName("[api] - 게시글 리스트 전체 조회")
     @Test
-    void test() throws Exception {
+    void articleAll() throws Exception {
         /* 일단 이 테스트는 실패해야 정상임. 이유는 해당 api를 찾을 수 없기 때문이다.
         *  콘솔창에 MockHttpServeletRequest 부분에 URI="/api/articles" 있을거다. 복사해서 브라우저에 https"/api/articles"치면 나온다.
         *
@@ -65,10 +73,9 @@ public class DataRestTest {
         *
         *  */
 
-//        mvc.perform(get("/api/articles"))
-//                .andExpect(status().isOk()).andExpect(content().contentType(MediaType.valueOf("application/hal+json")));
+        mvc.perform(get("/api/articles")).andExpect(status().isOk()).andExpect(content().contentType(MediaType.valueOf("application/hal+json")));
 
-        mvc.perform(get("/api/articles")).andExpect(status().isOk()).andExpect(content().contentType("application/hal+json"));
+//        mvc.perform(get("/api/articles")).andExpect(status().isOk()).andExpect(content().contentType("application/hal+json"));
 
         /**
          *  특별한 import(딥다이브)
@@ -88,5 +95,25 @@ public class DataRestTest {
          *      valueOf 안에 들어갈 content-type은 아까 HAL의 Response Header에 있는 content-type에 있는거 복사해오기
          *
          * **/
+    }
+    @Test
+    @DisplayName("[api] - 게시글 단건 조회")
+    void articleOne() throws Exception {
+        mvc.perform(get("/api/articles/1")).andExpect(status().isOk()).andExpect(content().contentType(MediaType.valueOf("application/hal+json")));
+    }
+    @Test
+    @DisplayName("[api] - 댓글 리스트 전체 조회")
+    void articleCommentsAll() throws Exception {
+        mvc.perform(get("/api/articleComments")).andExpect(status().isOk()).andExpect(content().contentType(MediaType.valueOf("application/hal+json")));
+    }
+    @Test
+    @DisplayName("[api] - 댓글 단건 조회")
+    void articleCommentsOne() throws Exception {
+        mvc.perform(get("/api/articles/1")).andExpect(status().isOk()).andExpect(content().contentType(MediaType.valueOf("application/hal+json")));
+    }
+    @Test
+    @DisplayName("[api] - 게시물의 댓글 리스트 조회")
+    void articleCommentsAllByArticle() throws Exception {
+        mvc.perform(get("/api/articles/1/articleComments")).andExpect(status().isOk()).andExpect(content().contentType(MediaType.valueOf("application/hal+json")));
     }
 }
